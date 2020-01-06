@@ -34,8 +34,8 @@ vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Ein
 T_wt_in             = 293.15;
 T_bg_in             = 293.15;
 T_u                 = 293.15;
-ms_CH4              = 4*(10.^(-5));
-ms_wt_f             = 4.5*(10.^(-5));
+ms_CH4              = 5*(10.^(-5)); ... 4*(10.^(-5));
+ms_wt_f             = 4.5*(10.^(-5)); ... Vorher 4.5 *(10.^(-5) )
 
 %% Parameterfestlegung des Integrators
 
@@ -47,10 +47,9 @@ Par_Ini             = [293.15;293.15;293.15]; ... Anfangsbedingungen des Integra
   
 % Reaktionsgleichung bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
     
-molM_CH4            = 0.01604; 
-molM_O2             = 0.032;   
-molM_N2             = 0.028;
-
+molM_CH4            =  0.01604; 
+molM_O2             =  0.032;   
+molM_N2             =  0.028;
 ns_CH4           	=  ms_CH4 / molM_CH4;
 ns_O2               =  2*ns_CH4;                
 ns_N2               =  (79/21)*ns_O2;
@@ -112,11 +111,18 @@ eta_wt_f = 38.48*(10.^(-6));  % bei 750°C (g)
 % r  = (2*ms)/(Pi*eta*Re)
 
 Re_b  = 200;          % Reynoldszahl für Brenngas (laminare Strömung)
-Re_wt = 3000;         % Reynoldszahl für Wasser   (turbulente Strömung)
+Re_wt = 2000;         % Reynoldszahl für Wasser   (turbulente Strömung)
 
-R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner                  
-r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
-D     =   0.005;                       % Wanddicke vom Brenner
+%R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner  
+
+R = 0.15; 
+%r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
+
+%Dimensionierung Massenstrom des Fluides �ber vorher festgelegten Radius und Reynolds Zahl 
+r = 0.005; 
+ms_wt_f = r*eta_wt_f*pi*Re_wt/2;
+
+D     =      0.005;                       % Wanddicke vom Brenner
 
 H = V_b_i/(pi*R*R); 
 h = V_wt/(pi*r*r);
@@ -127,8 +133,7 @@ V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner
-A_wt                   =   2*pi*r*(r+h);            ... Wärmetauscher
-
+A_wt                =   1; ...2*pi*r*(r+h);            ... Wärmetauscher
 %% Berechnung der Massen
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
