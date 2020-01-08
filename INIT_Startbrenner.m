@@ -181,7 +181,7 @@ k_gas_w              = 1000;
 
 %% Festlegung des Parametervektors
 
-vec_par     = zeros(19,1);
+vec_par     = zeros(22,1);
 
 
 vec_par(1)  = m_b;
@@ -203,10 +203,13 @@ vec_par(16) = A_bw_a;
 vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
+vec_par(20) = T_bg_in;
+vec_par(21) = T_wt_in ;
+vec_par(22) = T_u;
 
 %Arbeitspunkte von u/x
 
-u_AP = [ T_bg_in ; T_wt_in ; T_u ; ms_bg ; ms_wt_f ];
+u_AP = [ms_bg ; ms_wt_f ];
 x_AP = 900*ones(size(vec_x));
 
 %Linearisierung des Zustandvektors

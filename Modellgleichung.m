@@ -7,11 +7,8 @@ T_b             = vec_x(1);
 T_wt_out        = vec_x(2);
 T_bw            = vec_x(3);
 
-T_bg_in         = vec_u(1);
-T_wt_in         = vec_u(2);
-T_u             = vec_u(3);
-ms_bg           = vec_u(4);
-ms_wt_f         = vec_u(5);
+ms_bg           = vec_u(1);
+ms_wt_f         = vec_u(2);
 
 m_b             = vec_par(1);
 c_b             = vec_par(2);
@@ -32,6 +29,9 @@ A_bw_a          = vec_par(16);
 A_bw_i          = vec_par(17);
 k_gas_w         = vec_par(18);
 k_w_luft        = vec_par(19);
+T_bg_in         = vec_par(20);
+T_wt_in         = vec_par(21);
+T_u             = vec_par(22);
 
 
 dx_dt(1) = (1/(m_b*c_b))     * (ms_bg*c_bg*( T_bg_in - T_b )       -  A_wt*k_gas_wt*(T_b - T_wt_out)   - A_bw_i*k_gas_w*(T_b - T_bw) + H0*ns_bg*y_0-Q_a);
