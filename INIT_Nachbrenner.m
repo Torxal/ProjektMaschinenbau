@@ -35,7 +35,7 @@ T_wt_in             = 293.15;
 T_bg_in             = 1000;
 T_u                 = 293.15;
 ms_H2               = 5*(10.^(-5)); 
-ms_wt_f             = 3*(10.^(-6)); ... Vorgabe war 5*(10.^(-6)) Test: Nachher pr�fen
+ms_wt_f             = 5*(10.^(-6)); ... Vorgabe war 5*(10.^(-6)) Test: Nachher pr�fen
 
 %% Parameterfestlegung des Integrators
 
@@ -131,7 +131,7 @@ h = H;
 V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
 
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
-wd                  =   15; 
+wd                  =   10; 
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner

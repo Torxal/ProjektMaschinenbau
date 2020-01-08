@@ -27,7 +27,7 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
+vec_u = [ms_wt_f_sym; ms_bg_sym];    ... Eingangssignal     
         
 %% Festlegung der Eingangswerte
 
@@ -67,10 +67,10 @@ mAnteil_N2          = (ms_N2/ms_bg);
 %% Berechnung der mittleren Dichte des Brenngasgemisches
 
 rho_CH4             = 0.656;           % Dichte in kg/(m^3)
-rho_O2              = 1.43;
-rho_N2              = 1.25;
+rho_O2              = 1.43;     
+rho_N2              = 1.25;     
 rho_eisen           = 7874;          
-rho_wt_f            = 997;
+rho_wt_f            = 997;      
 
 %mittlere Dichte des Brenngases (Methan + Luft)
 
@@ -181,7 +181,7 @@ k_gas_w              = 1000;
 
 %% Festlegung des Parametervektors
 
-vec_par     = zeros(22,1);
+vec_par     = zeros(24,1);
 
 
 vec_par(1)  = m_b;
@@ -207,9 +207,11 @@ vec_par(20) = T_bg_in;
 vec_par(21) = T_wt_in ;
 vec_par(22) = T_u;
 
+%Für Startbrenner = 0 
+vec_par(23) = 0; 
 %Arbeitspunkte von u/x
 
-u_AP = [ms_bg ; ms_wt_f ];
+u_AP = [ ms_wt_f; ms_bg ];
 x_AP = 900*ones(size(vec_x));
 
 %Linearisierung des Zustandvektors
