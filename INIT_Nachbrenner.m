@@ -32,26 +32,27 @@ vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Ein
 %% Festlegung der Eingangswerte
 
 T_wt_in             = 293.15;
-T_bg_in             = 293.15;
+T_bg_in             = 1000;
 T_u                 = 293.15;
-ms_H2              = 5*(10.^(-5)); ... 4*(10.^(-5));
-ms_wt_f             = 4.5*(10.^(-5)); ... Vorher 4.5 *(10.^(-5) )
+ms_H2               = 5*(10.^(-5)); 
+ms_wt_f             = 3*(10.^(-6)); ... Vorgabe war 5*(10.^(-6)) Test: Nachher pr�fen
 
 %% Parameterfestlegung des Integrators
 
-Par_Ini             = [293.15;293.15;293.15]; ... Anfangsbedingungen des Integrators
+Par_Ini             = [1000;293.15;293.15]; ... Anfangsbedingungen des Integrators
 
 
-%% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
-% (Annahme : eingehender Massenstrom an Methan = 4*e-5 kg/s und wird vollst�ndig verbrannt)
+%% Berechnung der Massenanteile von Wasserstoff, Sauerstoff und Stickstoff im Brenngasgemisch
+% (Annahme : eingehender Massenstrom an Wasserstoff = 5*(10.^(-6)) und wird vollst�ndig verbrannt)
   
-% Reaktionsgleichung bei vollst. Verbrennung : H2 + 2 O2 -> CO2 + 2 H2O
+% Reaktionsgleichung bei vollst. Verbrennung : 2 H2 + O2 -> 2 H2O
     
-molM_H2            =  0.01604; 
+molM_H2             =  0.001; 
 molM_O2             =  0.032;   
 molM_N2             =  0.028;
+
 ns_H2           	=  ms_H2 / molM_H2;
-ns_O2               =  2*ns_H2;                
+ns_O2               =  0.5*ns_H2;                
 ns_N2               =  (79/21)*ns_O2;
         
 ms_O2               = ns_O2*molM_O2;
@@ -60,13 +61,13 @@ ms_N2               = ns_N2*molM_N2;
 ms_bg               = ms_H2 + ms_O2 + ms_N2;
 ns_bg               = ns_H2 + ns_O2 + ns_N2;
 
-mAnteil_H2         = (ms_H2/ms_bg);
+mAnteil_H2          = (ms_H2/ms_bg);
 mAnteil_O2          = (ms_O2/ms_bg);
 mAnteil_N2          = (ms_N2/ms_bg);
 
 %% Berechnung der mittleren Dichte des Brenngasgemisches
 
-rho_H2             = 0.656;           % Dichte in kg/(m^3)
+rho_H2              = 0.0899;           % Dichte in kg/(m^3)
 rho_O2              = 1.43;
 rho_N2              = 1.25;
 rho_eisen           = 7874;          
@@ -93,7 +94,7 @@ V_wt         =   Vs_wt/delta_wt;
 
 %% Dynamsiche Viskositäten bei 15°C
 
-eta_H2 = 10.8 *(10.^-6);        
+eta_H2  = 8.73 *(10.^-6);        
 eta_O2  = 19.2 *(10.^-6);
 eta_N2  = 16.2 *(10.^-6);
 eta_bg  = (mAnteil_H2)*eta_H2 + (mAnteil_O2)*eta_O2 + (mAnteil_N2)*eta_N2;    % dyn. Viskosität des Brenngases
@@ -115,7 +116,7 @@ Re_wt = 2000;         % Reynoldszahl für Wasser   (turbulente Strömung)
 
 %R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner  
 
-R = 0.15; 
+R = 0.05; 
 %r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
 
 %Dimensionierung Massenstrom des Fluides �ber vorher festgelegten Radius und Reynolds Zahl 
@@ -126,14 +127,15 @@ D     =      0.005;                       % Wanddicke vom Brenner
 
 H = V_b_i/(pi*R*R); 
 h = V_wt/(pi*r*r);
-
+h = H; 
 V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
 
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
+wd                  =   15; 
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner
-A_wt                =   1; ...2*pi*r*(r+h);            ... Wärmetauscher
+A_wt                =   2*pi*r*(r+h*wd);            ... Wärmetauscher
 %% Berechnung der Massen
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
@@ -142,7 +144,7 @@ m_wt                =   V_wt*rho_wt_f;              ... Wärmetauscher
 
 %% Parametrieren der spezifischen W�rmekapazit�ten
          
-c_H2               =   1867;
+c_H2                =   14940;
 c_O2                =   920;
 c_N2                =   1042;         
 c_eisen             =   452;
@@ -163,7 +165,7 @@ y_H2               =   (ns_H2/ns_bg);     % in Prozent
 % Bildungsenthlpie = Betrag{[Summe der Enthalpien in Produkte - Summe der Enthalpien in Edukte]
 % Unter Beachtung der st�chometrischen Verh�tnisse 
      
-H_H2       = -75000;          % in J/mol
+H_H2       = 0;          % in J/mol
 H_O2        = 0;
 H_CO2       = -392000;
 H_H2O       = -241000;

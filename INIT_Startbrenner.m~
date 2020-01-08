@@ -115,11 +115,11 @@ Re_wt = 2000;         % Reynoldszahl für Wasser   (turbulente Strömung)
 
 %R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner  
 
-R = 0.05; 
+R = 0.10; 
 %r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
 
 %Dimensionierung Massenstrom des Fluides �ber vorher festgelegten Radius und Reynolds Zahl 
-r = 0.005; 
+r = 0.01; 
 ms_wt_f = r*eta_wt_f*pi*Re_wt/2;
 
 D     =      0.005;                       % Wanddicke vom Brenner
@@ -132,7 +132,7 @@ V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
 
 %Wiederholung Rohrschleife
-wd                  =   15; 
+wd                  =   20; 
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner
