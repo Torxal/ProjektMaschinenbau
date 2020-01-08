@@ -219,7 +219,7 @@ b       = b*0;
 
 dx_dt = Modellgleichung (vec_x ,vec_u , vec_par);
 
-%lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
+lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
 
 %b     = double(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_u, u_AP));
 
