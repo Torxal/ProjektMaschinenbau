@@ -27,7 +27,7 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
+vec_u = [ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
         
 %% Festlegung der Eingangswerte
 
@@ -202,10 +202,12 @@ vec_par(16) = A_bw_a;
 vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
-
+vec_par(20) = T_bg_in;
+vec_par(21) = T_wt_in ;
+vec_par(22) = T_u;
 %Arbeitspunkte von u/x
 
-u_AP = [ T_bg_in ; T_wt_in ; T_u ; ms_bg ; ms_wt_f ];
+u_AP = [ms_bg ; ms_wt_f ];
 x_AP = 900*ones(size(vec_x));
 
 %Linearisierung des Zustandvektors

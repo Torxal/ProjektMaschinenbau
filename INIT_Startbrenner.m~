@@ -27,7 +27,7 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
+vec_u = [ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
         
 %% Festlegung der Eingangswerte
 
@@ -115,11 +115,11 @@ Re_wt = 2000;         % Reynoldszahl für Wasser   (turbulente Strömung)
 
 %R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner  
 
-R = 0.10; 
+R = 0.05; 
 %r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
 
 %Dimensionierung Massenstrom des Fluides �ber vorher festgelegten Radius und Reynolds Zahl 
-r = 0.01; 
+r = 0.005; 
 ms_wt_f = r*eta_wt_f*pi*Re_wt/2;
 
 D     =      0.005;                       % Wanddicke vom Brenner
@@ -132,7 +132,7 @@ V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
 
 %Wiederholung Rohrschleife
-wd                  =   20; 
+wd                  =   15; 
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner
@@ -181,7 +181,7 @@ k_gas_w              = 1000;
 
 %% Festlegung des Parametervektors
 
-vec_par     = zeros(19,1);
+vec_par     = zeros(22,1);
 
 
 vec_par(1)  = m_b;
@@ -203,10 +203,13 @@ vec_par(16) = A_bw_a;
 vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
+vec_par(20) = T_bg_in;
+vec_par(21) = T_wt_in ;
+vec_par(22) = T_u;
 
 %Arbeitspunkte von u/x
 
-u_AP = [ T_bg_in ; T_wt_in ; T_u ; ms_bg ; ms_wt_f ];
+u_AP = [ms_bg ; ms_wt_f ];
 x_AP = 900*ones(size(vec_x));
 
 %Linearisierung des Zustandvektors
@@ -219,7 +222,7 @@ b       = b*0;
 
 dx_dt = Modellgleichung (vec_x ,vec_u , vec_par);
 
-%lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
+lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
 
 %b     = double(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_u, u_AP));
 

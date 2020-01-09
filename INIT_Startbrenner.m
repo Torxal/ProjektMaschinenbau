@@ -27,7 +27,7 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [T_bg_in_sym; T_wt_in_sym; T_u_sym ; ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
+vec_u = [ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
         
 %% Festlegung der Eingangswerte
 
