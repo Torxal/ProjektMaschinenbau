@@ -7,8 +7,10 @@ T_b             = vec_x(1);
 T_wt_out        = vec_x(2);
 T_bw            = vec_x(3);
 
-ms_bg           = vec_u(1);
-ms_wt_f         = vec_u(2);
+ms_wt_f         = vec_u(1);
+if  vec_par(20) < 500
+    ms_bg           = vec_u(2);
+end
 
 m_b             = vec_par(1);
 c_b             = vec_par(2);
@@ -32,8 +34,9 @@ k_w_luft        = vec_par(19);
 T_bg_in         = vec_par(20);
 T_wt_in         = vec_par(21);
 T_u             = vec_par(22);
-
-
+if vec_par(20) > 500 
+     ms_wt_f = vec_par(23); 
+end
 dx_dt(1) = (1/(m_b*c_b))     * (ms_bg*c_bg*( T_bg_in - T_b )       -  A_wt*k_gas_wt*(T_b - T_wt_out)   - A_bw_i*k_gas_w*(T_b - T_bw) + H0*ns_bg*y_0-Q_a);
 %dx_dt(2) = (1/(c_wt * m_wt)) * (ms_wt_f * c_wt_f * (T_wt_in - T_wt_out) +  A_wt*k_gas_wt*( T_b - T_wt_out ) - double(verdampfungswaerme(T_wt_out))*ms_wt_f- Q_b);
 dx_dt(2) = (1/(c_wt * m_wt)) * (ms_wt_f * c_wt_f * (T_wt_in - T_wt_out) +  A_wt*k_gas_wt*( T_b - T_wt_out ) - Q_b);

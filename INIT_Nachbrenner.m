@@ -27,32 +27,37 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [ms_bg_sym; ms_wt_f_sym];    ... Eingangssignal     
+vec_u = [ms_wt_f_sym];    ... Eingangssignal     
         
 %% Festlegung der Eingangswerte
 
 T_wt_in             = 293.15;
-T_bg_in             = 1000;
+T_bg_in             = 293.15;
 T_u                 = 293.15;
-ms_H2               = 5*(10.^(-5)); 
-ms_wt_f             = 3*(10.^(-6)); ... Vorgabe war 5*(10.^(-6)) Test: Nachher pr�fen
+ms_H2              = 5*(10.^(-6)); ... Auslegung an vorgebenen Parametern 
 
 %% Parameterfestlegung des Integrators
 
 Par_Ini             = [1000;293.15;293.15]; ... Anfangsbedingungen des Integrators
 
+%% Mittelere Dichten 
 
-%% Berechnung der Massenanteile von Wasserstoff, Sauerstoff und Stickstoff im Brenngasgemisch
-% (Annahme : eingehender Massenstrom an Wasserstoff = 5*(10.^(-6)) und wird vollst�ndig verbrannt)
+rho_H2              = 0.0899;           % Dichte in kg/(m^3)
+rho_O2              = 1.43;
+rho_N2              = 1.25;
+rho_eisen           = 7874;          
+rho_wt_f            = 997;
+
+%% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
+% (Annahme : eingehender Massenstrom an Methan = 4*e-5 kg/s und wird vollst�ndig verbrannt)
   
-% Reaktionsgleichung bei vollst. Verbrennung : 2 H2 + O2 -> 2 H2O
+% Reaktionsgleichung bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
     
 molM_H2             =  0.001; 
 molM_O2             =  0.032;   
 molM_N2             =  0.028;
-
 ns_H2           	=  ms_H2 / molM_H2;
-ns_O2               =  0.5*ns_H2;                
+ns_O2               =  1/2*ns_H2;                
 ns_N2               =  (79/21)*ns_O2;
         
 ms_O2               = ns_O2*molM_O2;
@@ -65,43 +70,19 @@ mAnteil_H2          = (ms_H2/ms_bg);
 mAnteil_O2          = (ms_O2/ms_bg);
 mAnteil_N2          = (ms_N2/ms_bg);
 
-%% Berechnung der mittleren Dichte des Brenngasgemisches
 
-rho_H2              = 0.0899;           % Dichte in kg/(m^3)
-rho_O2              = 1.43;
-rho_N2              = 1.25;
-rho_eisen           = 7874;          
-rho_wt_f            = 997;
-
-%mittlere Dichte des Brenngases (Methan + Luft)
+%% Mittlere Dichte des Brenngases (Methan + Luft
 
 rho_bg              =  (mAnteil_H2)*rho_H2 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2; 
- 
-%% Berechnung der Volumina des Brenners bzw des Wärmetauschers (werden als Zylinder angenommen)        
-        
-% bei einem vollständigem Massenaustausch im Brennraum innerhalb 1 Sekunde
-%  m_b : ms_b
-
-delta_wt     =   1;            % Massenaustauschverhältnis in %/sek
-delta_b      =   1;
-
-Vs_bg        =   ms_bg/rho_bg;    % Volumenstrom Brenngas bzw. Wasser
-Vs_wt        =   ms_wt_f/rho_wt_f;
-
-V_b_i        =   Vs_bg/delta_b;   % Volumen des Brennerinnenraumes bzw Wärmetauschers
-V_wt         =   Vs_wt/delta_wt;
-
-
 %% Dynamsiche Viskositäten bei 15°C
 
-eta_H2  = 8.73 *(10.^-6);        
+eta_H2 = 10.8 *(10.^-6);        
 eta_O2  = 19.2 *(10.^-6);
 eta_N2  = 16.2 *(10.^-6);
 eta_bg  = (mAnteil_H2)*eta_H2 + (mAnteil_O2)*eta_O2 + (mAnteil_N2)*eta_N2;    % dyn. Viskosität des Brenngases
 
 %eta_wt_f = 890*(10.^(-6));   % bei 25°C (l) 
 eta_wt_f = 38.48*(10.^(-6));  % bei 750°C (g)
-
 
 %% Bestimmung der Radien abhängig von der Reynoldszahl der Strömung 
 
@@ -112,25 +93,32 @@ eta_wt_f = 38.48*(10.^(-6));  % bei 750°C (g)
 % r  = (2*ms)/(Pi*eta*Re)
 
 Re_b  = 200;          % Reynoldszahl für Brenngas (laminare Strömung)
-Re_wt = 2000;         % Reynoldszahl für Wasser   (turbulente Strömung)
-
+Re_wt = 3000;         % Reynoldszahl für Wasser   (turbulente Strömung)
 %R = (2*ms_bg)/(eta_bg*pi*Re_b);        % Radius Brenner  
-
 R = 0.05; 
 %r = (2*ms_wt_f)/(eta_wt_f*pi*Re_wt);   % Radius Wärmetauscher
-
 %Dimensionierung Massenstrom des Fluides �ber vorher festgelegten Radius und Reynolds Zahl 
 r = 0.005; 
 ms_wt_f = r*eta_wt_f*pi*Re_wt/2;
 
-D     =      0.005;                       % Wanddicke vom Brenner
-
-H = V_b_i/(pi*R*R); 
-h = V_wt/(pi*r*r);
+D     =      0.005;                       % Wanddicke vom Brenner 
+%% Berechnung der Volumina des Brenners bzw des Wärmetauschers (werden als Zylinder angenommen)              
+% bei einem vollständigem Massenaustausch im Brennraum innerhalb 1 Sekunde
+%  m_b : ms_b
+delta_wt     =   1;            % Massenaustauschverhältnis in %/sek
+delta_b      =   1;
+Vs_bg        =   ms_bg/rho_bg;    % Volumenstrom Brenngas bzw. Wasser
+V_b_i        =   Vs_bg/delta_b;   % Volumen des Brennerinnenraumes bzw Wärmetauschers
+%Vs_wt        =   ms_wt_f/rho_wt_f;
+%V_wt         =   Vs_wt/delta_wt;
+H = V_b_i/(pi*R*R); %H�he des Brenners und der Brennerwand  
+%h = V_wt/(pi*r*r);
 h = H; 
 V_b_a        =   H*pi*((R+D).^2); % äußere Volumen des Brenners
-
+V_wt         =   h*pi*((r).^2);
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
+
+%Wiederholung Rohrschleife
 wd                  =   15; 
 
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
@@ -144,7 +132,7 @@ m_wt                =   V_wt*rho_wt_f;              ... Wärmetauscher
 
 %% Parametrieren der spezifischen W�rmekapazit�ten
          
-c_H2                =   14940;
+c_H2               =   1870;
 c_O2                =   920;
 c_N2                =   1042;         
 c_eisen             =   452;
@@ -167,20 +155,34 @@ y_H2               =   (ns_H2/ns_bg);     % in Prozent
      
 H_H2       = 0;          % in J/mol
 H_O2        = 0;
-H_CO2       = -392000;
 H_H2O       = -241000;
  
-H0  = abs((H_CO2 + 2*H_H2O) - (H_H2 + 2*H_O2));                    
+H0  = abs(-2820000);                    
 
-%% Festlegung der W�rme�bergangskoeffizienten
-
+%% Festlegung des realten Massenstroms CH4  
 k_gas_wt             = 1000;
 k_w_luft             = 10;
 k_gas_w              = 1000;
 
+ms_H2               = 1*(10.^(-6)); % bitte festlegen 
+ms_wt_f             = ms_wt_f*50;
+ns_H2           	=  ms_H2 / molM_H2;
+ns_O2               =  2*ns_H2;                
+ns_N2               =  (79/21)*ns_O2;
+        
+ms_O2               = ns_O2*molM_O2;
+ms_N2               = ns_N2*molM_N2;
+
+ms_bg               = ms_H2 + ms_O2 + ms_N2;
+ns_bg               = ns_H2 + ns_O2 + ns_N2;
+
+mAnteil_H2          = (ms_H2/ms_bg);
+mAnteil_O2          = (ms_O2/ms_bg);
+mAnteil_N2          = (ms_N2/ms_bg);
+
 %% Festlegung des Parametervektors
 
-vec_par     = zeros(19,1);
+vec_par     = zeros(23,1);
 
 
 vec_par(1)  = m_b;
@@ -205,9 +207,11 @@ vec_par(19) = k_w_luft;
 vec_par(20) = T_bg_in;
 vec_par(21) = T_wt_in ;
 vec_par(22) = T_u;
+vec_par(23) = ms_bg;
+
 %Arbeitspunkte von u/x
 
-u_AP = [ms_bg ; ms_wt_f ];
+u_AP = [ms_wt_f];
 x_AP = 900*ones(size(vec_x));
 
 %Linearisierung des Zustandvektors
@@ -222,9 +226,9 @@ dx_dt = Modellgleichung (vec_x ,vec_u , vec_par);
 
 lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
 
-b     = double(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_u, u_AP));
+%b     = double(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_u, u_AP));
 
-
+%
 % stat. Arbeitspunkt ausrechnen: 
 
 dx_dt = Modellgleichung (vec_x ,u_AP, vec_par)
@@ -255,7 +259,11 @@ double(x_AP_berechnet.x2)
 % Re_wt        =   (2*ms_wt_f)/(pi*r*eta_wt_f);
 
 
-
+%% Regelung
+%p_w gew�nschte Polstelle
+%K = place(lin_A, b, p_w); 
+%pw =... 
+%p_or = eig(lin_A); 
 
 
 
