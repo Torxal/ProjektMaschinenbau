@@ -35,20 +35,16 @@ T_wt_in             = 293.15;       ... Eingangstemperatur des Wärmetauschers
 T_bg_in             = 1000;         ... Eingangstemperautur des Brenners 
 T_u                 = 293.15;       ... Umgebungstemperatur
 ms_H2               = 5*(10.^(-6)); ... Massenstrom Wasserstoff  
-ms_wt_f             = 3*10^(-4);
+ms_wt_f             = 1.1*10^(-3);
 % Parameterfestlegung des Integrators
 
 Par_Ini             = [1000;293.15;293.15];      ... Anfangsbedingungen des Integrators
-%% Festlegen der Bauteilgeometire  
+%% Festlegen der Brennergeometrie  
 
-R     = 0.05;                        ... Radius des Brenners
-r     = 0.005;                       ... Radius des Wärmetauscherrohrs
-D     = 0.005;                       ... Wanddicke vom Brenner 
-wd    = 80;                          ... Anzahl der Rohrwiederholungen (Fläche wurde so gewählt, dass 80% des Brennraumvolumens eingenommen wird)
+R     = 0.025;                        ... Radius des Brenners
+D     = 0.005;                       ... Wanddicke vom Brenner                          ... Anzahl der Rohrwiederholungen (Fläche wurde so gewählt, dass 80% des Brennraumvolumens eingenommen wird)
 H     = 0.05;                        ... Länge/Höhe des Brennraumzylinders
-h     = H;                           ... Länge/Höhe des Wärmetauscherzylinders | Hier unter der Annahme, dass der Wärmetauscher auf der Länge vollständig hindruchgeht 
-
-%% Wärmeübertragungskoeffizienten 
+%% Wärmedurchgangskoeffizienten  
 
 k_gas_wt             = 40;
 k_w_luft             = 0.4;
@@ -61,6 +57,7 @@ rho_O2              = 1.43;         ... Dichte Sauerstoff
 rho_N2              = 1.25;         ... Dichte Stickstoff 
 rho_eisen           = 7874;         ... Dichte Eisen
 rho_wt_f            = 997;          ... Dichte Wasser im Wärmetauscher  
+rho_H2O             = 0.997;
 
 %% Parametrieren der spezifischen Wärmekapazitäten
          
@@ -98,21 +95,20 @@ mAnteil_N2          = (ms_N2/ms_bg);
 mAnteil_H2O         = (ms_H2O/ms_bg); 
 
 %% Mittlere Dichte des Brenngases (Methan + Luft
-rho_bg              =  (mAnteil_H2)*rho_H2 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2; 
+rho_bg              =  (mAnteil_H2)*rho_H2 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2 + (mAnteil_H2O)*rho_H2O; 
 
 %% Volumen Brenner und Wärmetauscher 
 V_b_i        =   H*pi*((R)^2);
 V_b_a        =   H*pi*((R+D).^2); % Äußere Volumen des Brenners
-V_wt         =   h*wd*pi*((r).^2);
 %% Berechnung der Innen- und Außenfläche der Brennerwand (zylindrig)
 A_bw_a              =   2*pi*(R+D)*((R+D)+H);       ... Außenwand Brenner
 A_bw_i              =   2*pi*R*(R+H);               ... Innenwand Brenner
-A_wt                =   2*pi*r*(r+h*wd);            ... Wärmetauscher
+A_wt                =   0.12;            ... Wärmetauscher
 %% Berechnung der Massen
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
 m_b                 =   V_b_i*rho_bg;               ... Brenner
-m_wt                =   V_wt*rho_wt_f;              ... Wärmetauscher
+m_wt                =   0.65        ;               ... Wärmetauscher
 
 %% Mittlung der spezifischen Wärmekapazität
 
@@ -126,12 +122,8 @@ y_H2               =   (ns_H2/ns_bg);     % in Prozent
 
 
 %% Verbrennungsenthalpie
-% Bildungsenthlpie = Betrag{[Summe der Enthalpien in Produkte - Summe der Enthalpien in Edukte]
-% Unter Beachtung der stï¿½chometrischen Verhï¿½tnisse 
-     
-H_H2        = 0;          % in J/mol
-H_O2        = 0;
-H_H2O       = -241000;
+
+    
 H0          = abs(-2820000);                    
 
 %% Festlegung des Parametervektors

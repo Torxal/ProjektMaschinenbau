@@ -45,7 +45,7 @@ R     = 0.05;                        ... Radius des Brenners
 r     = 0.005;                       ... Radius des Wärmetauscherrohrs
 D     = 0.005;                       ... Wanddicke vom Brenner 
 wd    = 80;                          ... Anzahl der Rohrwiederholungen (Fläche wurde so gewählt, dass 80% des Brennraumvolumens eingenommen wird)
-H     = 0.05;                        ... Länge/Höhe des Brennraumzylinders
+H     = 0.0092;                        ... Länge/Höhe des Brennraumzylinders
 h     = H;                           ... Länge/Höhe des Wärmetauscherzylinders | Hier unter der Annahme, dass der Wärmetauscher auf der Länge vollständig hindruchgeht 
 
 %% Wärmeübertragungskoeffizienten 
@@ -98,7 +98,7 @@ mAnteil_N2          = (ms_N2/ms_bg);
 mAnteil_H2O         = (ms_H2O/ms_bg); 
 
 %% Mittlere Dichte des Brenngases (Methan + Luft
-rho_bg              =  (mAnteil_H2)*rho_H2 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2; 
+rho_bg              =  (mAnteil_H2)*rho_H2 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2 + (mAntei_H); 
 
 %% Volumen Brenner und Wärmetauscher 
 V_b_i        =   H*pi*((R)^2);
