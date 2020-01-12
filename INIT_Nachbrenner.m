@@ -35,15 +35,15 @@ T_wt_in             = 293.15;       ... Eingangstemperatur des Wärmetauschers
 T_bg_in             = 1000;         ... Eingangstemperautur des Brenners 
 T_u                 = 293.15;       ... Umgebungstemperatur
 ms_H2               = 5*(10.^(-6)); ... Massenstrom Wasserstoff  
-ms_wt_f             = 1.1*10^(-3);
+ms_wt_f             = 5.5*10^(-4);
 % Parameterfestlegung des Integrators
 
 Par_Ini             = [1000;293.15;293.15];      ... Anfangsbedingungen des Integrators
 %% Festlegen der Brennergeometrie  
 
-R     = 0.025;                        ... Radius des Brenners
+R     = 0.01;                        ... Radius des Brenners
 D     = 0.005;                       ... Wanddicke vom Brenner                          ... Anzahl der Rohrwiederholungen (Fläche wurde so gewählt, dass 80% des Brennraumvolumens eingenommen wird)
-H     = 0.05;                        ... Länge/Höhe des Brennraumzylinders
+H     = 0.025;                        ... Länge/Höhe des Brennraumzylinders
 %% Wärmedurchgangskoeffizienten  
 
 k_gas_wt             = 40;
@@ -56,8 +56,7 @@ rho_H2              = 0.0899;       ... Dichte Wasserstoff
 rho_O2              = 1.43;         ... Dichte Sauerstoff 
 rho_N2              = 1.25;         ... Dichte Stickstoff 
 rho_eisen           = 7874;         ... Dichte Eisen
-rho_wt_f            = 997;          ... Dichte Wasser im Wärmetauscher  
-rho_H2O             = 0.997;
+rho_H2O             = 0.59;         ... Dampf 
 
 %% Parametrieren der spezifischen Wärmekapazitäten
          
@@ -69,8 +68,7 @@ c_bw                =   c_eisen;
 c_wt_f              =   4190;
 c_H2O               =   4190; 
 %% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
-% (Annahme : eingehender Massenstrom an Methan = 4*e-5 kg/s und wird vollstï¿½ndig verbrannt)
-% Reaktionsgleichung bei vollst. Verbrennung : H2 + 1/2O2 --> H20
+
 ms_H2O              = 4.5*10^(-5);   ... Aus Richtwerten
 
 molM_H2             =  0.001; 
@@ -78,7 +76,7 @@ molM_O2             =  0.032;
 molM_N2             =  0.028;
 molM_H2O            =  0.016;
 
-ns_H2           	=  ms_H2 / molM_H2O;
+ns_H2           	=  ms_H2 / molM_H2;
 ns_O2               =  1/2*ns_H2;                
 ns_N2               =  (79/21)*ns_O2;
 ns_H2O              =  ms_H2O / molM_H2O; 
@@ -108,11 +106,10 @@ A_wt                =   0.12;            ... Wärmetauscher
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
 m_b                 =   V_b_i*rho_bg;               ... Brenner
-m_wt                =   0.65        ;               ... Wärmetauscher
+m_wt                =   1.17*10^(-4)       ;               ... Wärmetauscher
 
 %% Mittlung der spezifischen Wärmekapazität
 
-c_wt                =   c_wt_f;
 c_bg                =   (mAnteil_H2)*c_H2 + (mAnteil_O2)*c_O2 + (mAnteil_N2)*c_N2 + (mAnteil_H2O)*c_H2O;
 c_b                 =   c_bg;
 
@@ -124,9 +121,10 @@ y_H2               =   (ns_H2/ns_bg);     % in Prozent
 %% Verbrennungsenthalpie
 
     
-H0          = abs(-2820000);                    
+H0          = abs(-282000);                    
 
 %% Festlegung des Parametervektors
+c_wt = 0; %.. Bitte ignorieren. Hat kein Relevanz mehr
 
 vec_par     = zeros(24,1);
 
@@ -192,9 +190,6 @@ double(x_AP_berechnet.x2)
 %pw =... 
 %p_or = eig(lin_A); 
 
-%% Überschlägige Übersicht-- bitte ignorieren 
- 
-fprintf('Wie viel Wasser läuft pro Sekunde durch den Wärmetauscher? -> %6.2f.Liter/Sekunde \n',ms_wt_f*1000);
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
 % bei einem vollstÃ¤ndigem Massenaustausch im Brennraum innerhalb 1 Sekunde
 %  m_b : ms_b
