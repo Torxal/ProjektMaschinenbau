@@ -1,11 +1,9 @@
-function outputArg1 = verdampfungswaerme(inputArg1, inputArg2)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-%Wichtig! Gilt nur bei einem Betriebsdruck von 1 Bar
-outputArg1 = 0; 
-if inputArg1>=400
-    outputArg1 = 2.26*10^(6);   
-else 
-    outputArg1 = 0; 
+function Q_vd = verdampfungswaerme(T)
+
+ e = 0.01;
+ Q_vd =  1/2*(1+tanh(1/e*(T-373.15)))*2.26*10^6 ;
+ 
 end
+ 
+
 
