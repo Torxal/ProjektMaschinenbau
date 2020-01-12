@@ -106,7 +106,7 @@ A_wt                =   0.12;            ... Wärmetauscher
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
 m_b                 =   V_b_i*rho_bg;               ... Brenner
-m_wt                =   1.17*10^(-4)       ;               ... Wärmetauscher
+m_wt                =   1.1*10^(-4)       ;               ... Wärmetauscher
 
 %% Mittlung der spezifischen Wärmekapazität
 
