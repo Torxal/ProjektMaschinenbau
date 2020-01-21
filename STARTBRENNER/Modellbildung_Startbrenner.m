@@ -173,7 +173,7 @@ vec_par(19) = k_w_air;
 
 
 
-e_AP = [T_bg_in ; T_wt_in ; T_u; ms_bg]; 
+e_AP = [T_bg_in ; T_wt_in ; T_u]; 
 u_AP = [ ms_bg ; ms_wt_air ];
 
 dx_dt = Modellgleichung_Startbrenner (vec_x ,u_AP, vec_par, e_AP);
