@@ -27,8 +27,7 @@ syms        T_bg_in_sym         ...
             ms_bg_sym           ... ms_bg_in = ms_bg_out
             ms_wt_f_sym         ... ms_wt_f_in = ms_wt_f_out
 
-vec_u = [ms_wt_f_sym];    ... Eingangssignal     
-        
+vec_u = [ms_wt_f_sym];    ... Eingangssignal              
 %% Festlegung der Eingangswerte
 
 T_wt_in             = 293.15;       ... Eingangstemperatur des Wärmetauschers 
@@ -126,7 +125,7 @@ H0          = abs(-282000);
 %% Festlegung des Parametervektors
 c_wt = 0; %.. Bitte ignorieren. Hat kein Relevanz mehr
 
-vec_par     = zeros(24,1);
+vec_par     = zeros(20,1);
 
 
 vec_par(1)  = m_b;
@@ -148,11 +147,17 @@ vec_par(16) = A_bw_a;
 vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
-vec_par(20) = T_bg_in;
-vec_par(21) = T_wt_in ;
-vec_par(22) = T_u;
-vec_par(23) = ms_bg;
-vec_par(24) = ms_H2O; 
+vec_par(20) = ms_H2O; 
+
+vec_e = zeros(4,1);
+
+vec_e(1) = T_bg_in;
+vec_e(2) = T_wt_in ;
+vec_e(3) = T_u;
+vec_e(4) = ms_bg;
+
+
+e_AP = [T_bg_in ; T_wt_in ; T_u; ms_bg];  
 %%
 %Arbeitspunkte von u/x
 
@@ -174,21 +179,20 @@ b       = b*0;
 %
 % stat. Arbeitspunkt ausrechnen: 
 
-dx_dt = Modellgleichung (vec_x ,u_AP, vec_par)
+dx_dt = Modellgleichung (vec_x ,u_AP, vec_par, vec_e)
 x_AP_berechnet = solve(dx_dt)
 double(x_AP_berechnet.x1)
 double(x_AP_berechnet.x2)
-
+vec_e = [T_bg_in_sym ; T_wt_in_sym ; T_u_sym; ms_bg_sym]; 
 x_AP = [double(x_AP_berechnet.x1);double(x_AP_berechnet.x2);double(x_AP_berechnet.x3)]
 
-dx_dt = Modellgleichung (vec_x ,vec_u , vec_par);
-lin_A = double(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_u, u_AP));
-b     = double(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_u, u_AP));
+dx_dt = Modellgleichung (vec_x ,vec_u , vec_par, vec_e);
 
-
-e_AP = [T_bg_in ; T_wt_in ; T_u; ms_bg];   
-
+lin_A = double(subs(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
+b     = double(subs(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
 E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
+
+%E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
 
 x0_lin = Par_Ini - [double(x_AP_berechnet.x1);double(x_AP_berechnet.x2);double(x_AP_berechnet.x3)];
 
