@@ -183,13 +183,16 @@ dx_dt = Modellgleichung (vec_x ,u_AP, vec_par, vec_e)
 x_AP_berechnet = solve(dx_dt)
 double(x_AP_berechnet.x1)
 double(x_AP_berechnet.x2)
-vec_e = [T_bg_in_sym ; T_wt_in_sym ; T_u_sym; ms_bg_sym]; 
 x_AP = [double(x_AP_berechnet.x1);double(x_AP_berechnet.x2);double(x_AP_berechnet.x3)]
 
+
+vec_e = [T_bg_in_sym ; T_wt_in_sym ; T_u_sym; ms_bg_sym]; 
 dx_dt = Modellgleichung (vec_x ,vec_u , vec_par, vec_e);
 
 lin_A = double(subs(subs(subs( jacobian(dx_dt,vec_x), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
+
 b     = double(subs(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
+
 E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
 
 %E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
@@ -204,7 +207,7 @@ x0_lin = Par_Ini - [double(x_AP_berechnet.x1);double(x_AP_berechnet.x2);double(x
 %Eigenwerte berechnen
 eigenwerte = eig(lin_A);
 %Gewünschter Eigenwert nach links verschoben
-gew_eigenwerte = eigenwerte*1;
+gew_eigenwerte = [eigenwerte(1)*1.05;eigenwerte(2)*10.0;eigenwerte(3)*1.05];
 
 k_T = place(lin_A,b,gew_eigenwerte);
 
