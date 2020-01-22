@@ -204,7 +204,7 @@ x0_lin = Par_Ini - [double(x_AP_berechnet.x1);double(x_AP_berechnet.x2);double(x
 %Eigenwerte berechnen
 eigenwerte = eig(lin_A);
 %Gewünschter Eigenwert nach links verschoben
-gew_eigenwerte = eigenwerte*2;
+gew_eigenwerte = eigenwerte*1;
 
 k_T = place(lin_A,b,gew_eigenwerte);
 
@@ -214,8 +214,7 @@ S_v = inv(C*inv(-lin_A+b*k_T)*b);
 
 
 % Für Simulink k_T transponieren
-k_T = transpose(k_T); 
-k_T = [k_T(1);k_T(2);k_T(3)];
+k_T;
 % Anfangsbedigungen des Regler für die linearisierte Zustandsraumdarstellung 
 x_lin_0 = Par_Ini - x_AP;
 
