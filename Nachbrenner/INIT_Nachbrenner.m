@@ -1,4 +1,4 @@
-%#eml
+  %#eml
 
 clear all; 
 close all; 
@@ -38,6 +38,8 @@ ms_wt_f             = 5.5*10^(-4);
 % Parameterfestlegung des Integrators
 
 Par_Ini             = [1000;293.15;293.15];      ... Anfangsbedingungen des Integrators
+
+g_f     = 10; 
 %% Festlegen der Brennergeometrie  
 
 R     = 0.01;                        ... Radius des Brenners
@@ -211,11 +213,12 @@ gew_eigenwerte = [eigenwerte(1)*1.05;eigenwerte(2)*10.0;eigenwerte(3)*1.05];
 
 k_T = place(lin_A,b,gew_eigenwerte);
 
-C   = [0, 1, 0]; 
+%C_sv   = [0, 1, 0]; 
 
-S_v = inv(C*inv(-lin_A+b*k_T)*b);
+%S_v = inv(C_sv*inv(-lin_A+b*k_T)*b);
 
-
+lin_C = [1,0,0;0,1,0;0,0,1];
+lin_D = [0;0;0];
 % Für Simulink k_T transponieren
 k_T;
 % Anfangsbedigungen des Regler für die linearisierte Zustandsraumdarstellung 
