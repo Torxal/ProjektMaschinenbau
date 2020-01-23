@@ -39,7 +39,7 @@ ms_wt_f             = 5.5*10^(-4);
 
 Par_Ini             = [1000;293.15;293.15];      ... Anfangsbedingungen des Integrators
 
-g_f     = 10; 
+g_f     = 1; 
 %% Festlegen der Brennergeometrie  
 
 R     = 0.01;                        ... Radius des Brenners
@@ -223,7 +223,7 @@ lin_D = [0;0;0];
 k_T;
 % Anfangsbedigungen des Regler für die linearisierte Zustandsraumdarstellung 
 x_lin_0 = Par_Ini - x_AP;
-
+steuerzeit = 1800;
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
 % bei einem vollstÃ¤ndigem Massenaustausch im Brennraum innerhalb 1 Sekunde
 %  m_b : ms_b
