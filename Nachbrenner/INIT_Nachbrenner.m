@@ -223,7 +223,7 @@ lin_D = [0;0;0];
 k_T;
 % Anfangsbedigungen des Regler für die linearisierte Zustandsraumdarstellung 
 x_lin_0 = Par_Ini - x_AP;
-steuerzeit = 1800;
+steuerzeit = 500;
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
 % bei einem vollstÃ¤ndigem Massenaustausch im Brennraum innerhalb 1 Sekunde
 %  m_b : ms_b
