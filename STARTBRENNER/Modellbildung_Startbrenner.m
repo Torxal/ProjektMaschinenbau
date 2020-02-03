@@ -39,7 +39,7 @@ T_bg_in             = 293.15;
 T_wt_in             = 293.15;
 T_u                 = 293.15;
 ms_CH4              = 4*(10.^(-4));
-ms_wt_air           = 4*(10.^(-4));
+ms_wt_air           = 6*(10.^(-3));
 
 %% Parameterfestlegung des Integrators
 
@@ -83,16 +83,16 @@ rho_bg              =  (mAnteil_CH4)*rho_CH4 + (mAnteil_O2)*rho_O2 + (mAnteil_N2
  
 %% Berechnung der Volumina des Brenners bzw des Wärmetauschers (werden als Zylinder angenommen)        
 
-R = 0.05;
+R = 0.12;
 D = 0.005;
-H = 0.10;
+H = 0.2;
 
 V_b_i = pi*H*R*R;
 V_b_a = pi*H*(R+D)*(R+D);
 
-r = 0.01;
-h = 0.05;
-n = 20;         % Anzahl der Rohrabknickungen/ -windungen
+r = 0.025;
+h = 0.10;
+n = 30;         % Anzahl der Rohrabknickungen/ -windungen
 
 V_wt  = n*pi*h*r*r;
 
@@ -105,7 +105,8 @@ A_wt                =   n*2*pi*r*(r+h);             ... Wärmetauscher
 %% Berechnung der Massen
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
-m_b                 =   (V_b_i-V_wt)*rho_bg;        ... Brenner
+m_b                 =   V_b_i*rho_bg;        ... Brenner
+%m_b                 =   (V_b_i-V_wt)*rho_bg;        ... Brenner
 m_wt                =   V_wt*rho_air;               ... Wärmetauscher
 
 %% Parametrieren der spezifischen Wärmekapazitäten
@@ -139,14 +140,13 @@ H0  = abs((H_CO2 + 2*H_H2O) - (H_CH4 + 2*H_O2));
 
 %% Festlegung der Wärmeübergangskoeffizienten
 
-k_gas_wt             = 100;
+k_gas_wt             = 80;
 k_w_air              = 0.01;
-k_gas_w              = 250;
+k_gas_w              = 200;
 
 %% Festlegung des Parametervektors
 
 vec_par     = zeros(19,1);
-
 
 vec_par(1)  = m_b;
 vec_par(2)  = c_b;
@@ -168,30 +168,20 @@ vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_air;
 
-%Arbeitspunkte von u/x
-
-
-
+%Arbeitspunkte 
 
 e_AP = [T_bg_in ; T_wt_in ; T_u]; 
 u_AP = [ ms_bg ; ms_wt_air ];
 
+
+% stat. Arbeitspunkt ausrechnen: 
+
 dx_dt = Modellgleichung_Startbrenner (vec_x ,u_AP, vec_par, e_AP);
+
 x_AP_berechnet = solve(dx_dt);
-x_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ; double(x_AP_berechnet.x2)];
-
-
-
-
-
+x_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ; double(x_AP_berechnet.x3)];
 
 %Linearisierung des Zustandvektors
-
-syms A B ;
-
-A   = A*0;
-
-B   = B*0;
 
 dx_dt = Modellgleichung_Startbrenner (vec_x ,vec_u ,vec_par, vec_e);
 
@@ -201,30 +191,52 @@ B = double(subs(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_e, e_AP), ve
 
 E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
 
-B_stoer = [B,E];
-
-% stat. Arbeitspunkt ausrechnen: 
-
-
-
 % Zeitkonstanten
 1./abs(eig(A))
 
-C =[1,0,0;0,1,0];
-D = zeros(2,2);
-D_stoer = zeros(2,5);
+% Eigenwertvorgabe
 
-p = eig(A);
-p_w = 1*p;
+p = (eig(A));
+p_w = 1.3*p;
+K = place(A,B,p_w); 
 
-K = place(A,B,p_w);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-S = inv(C*(inv(B*K - A))*B);
+% Störgrößen
 
-vec_u_stoer = [vec_u;vec_e];
-u_AP_stoer  = [u_AP;e_AP];
+D_e = zeros(3,5);
+B_e = [B,E];
+%K_e = K*[1,0;0,1;0,0];
+K_e = place(A,B_e,p_w);
 
-A_r = A-B*K;
 
+
+% Regelung
+
+C_lin = [1,0,0;0,1,0];
+D_lin = zeros(2,2);
+
+C =[1,0,0;0,1,0;0,0,1];
+D = zeros(3,2);
+
+ 
+S = (C_lin*((B*K-A)^(-1))*B)^(-1);
+% Initialisierungsparameter für die lineare ZRD
 Par_Ini_lin = Par_Ini - x_AP;
-x_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2)];
+
+% Zeitkonstant des geregleten Systems
+1./abs(eig(A-B_e*K_e))
+
+% Arbeitspunkte der Regelgröße
+x_AP_lin = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ];
+
+K_2 = [1,0;0,0]*K;
+
+p_2 = eig(A-B*K_2); % -> Eigenwerte sind negativ -> asymptotisch stabil
+
+%x_soll = x_AP_lin;
+x_soll = [ 2400 ; 2000];
+
+
+% vec_u_stoer = [vec_u;vec_e];
+% u_AP_stoer  = [u_AP;e_AP];
+
+
