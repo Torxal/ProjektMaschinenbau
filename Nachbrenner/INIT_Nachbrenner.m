@@ -225,7 +225,7 @@ k_T;
 x_lin_0 = Par_Ini - x_AP;
 steuerzeit = 500; % in Millisekunden
 y_AP = double(x_AP_berechnet.x2);
-
+y_soll = y_AP; % Kann abgeändert werden;  
 z = e_AP ; 
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
 % bei einem vollstÃ¤ndigem Massenaustausch im Brennraum innerhalb 1 Sekunde
