@@ -223,8 +223,8 @@ lin_D = [0;0;0];
 k_T;
 % Anfangsbedigungen des Regler für die linearisierte Zustandsraumdarstellung 
 x_lin_0 = Par_Ini - x_AP;
-steuerzeit = 500;
-x_AP_lin = double(x_AP_berechnet.x2);
+steuerzeit = 500; % in Millisekunden
+y_AP = double(x_AP_berechnet.x2);
 
 z = e_AP ; 
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
