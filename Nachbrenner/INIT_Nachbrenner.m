@@ -87,7 +87,6 @@ ms_N2               = ns_N2*molM_N2;
 
 ms_bg               = ms_H2 + ms_O2 + ms_N2 + ms_H2O;
 ns_bg               = ns_H2 + ns_O2 + ns_N2 + ns_H2O;
-
 mAnteil_H2          = (ms_H2/ms_bg);
 mAnteil_O2          = (ms_O2/ms_bg);
 mAnteil_N2          = (ms_N2/ms_bg);
@@ -150,7 +149,7 @@ vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
 vec_par(20) = ms_H2O; 
-
+ms_bg = 0; 
 vec_e = zeros(4,1);
 
 vec_e(1) = T_bg_in;
@@ -226,7 +225,7 @@ x_lin_0 = Par_Ini - x_AP;
 steuerzeit = 500; % in Millisekunden
 y_AP = double(x_AP_berechnet.x2);
 y_soll = y_AP; % Kann abgeändert werden;  
-z = e_AP ; 
+z = e_AP;
 %% Bitte ignorieren. Ist nur zur Prüfung der Größenverhältnisse Berechnung der Volumina des Brenners bzw des WÃ¤rmetauschers (werden als Zylinder angenommen)              
 % bei einem vollstÃ¤ndigem Massenaustausch im Brennraum innerhalb 1 Sekunde
 %  m_b : ms_b
