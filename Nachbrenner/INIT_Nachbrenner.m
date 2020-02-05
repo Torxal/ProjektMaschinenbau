@@ -87,6 +87,8 @@ ms_N2               = ns_N2*molM_N2;
 
 ms_bg               = ms_H2 + ms_O2 + ms_N2 + ms_H2O;
 ns_bg               = ns_H2 + ns_O2 + ns_N2 + ns_H2O;
+molM_bg             = ms_bg/ns_bg; 
+
 mAnteil_H2          = (ms_H2/ms_bg);
 mAnteil_O2          = (ms_O2/ms_bg);
 mAnteil_N2          = (ms_N2/ms_bg);
@@ -126,7 +128,7 @@ H0          = abs(-282000);
 %% Festlegung des Parametervektors
 c_wt = 0; %.. Bitte ignorieren. Hat kein Relevanz mehr
 
-vec_par     = zeros(20,1);
+vec_par     = zeros(21,1);
 
 
 vec_par(1)  = m_b;
@@ -149,7 +151,8 @@ vec_par(17) = A_bw_i;
 vec_par(18) = k_gas_w;
 vec_par(19) = k_w_luft;
 vec_par(20) = ms_H2O; 
-ms_bg = 0; 
+vec_par(21) = molM_bg;
+
 vec_e = zeros(4,1);
 
 vec_e(1) = T_bg_in;

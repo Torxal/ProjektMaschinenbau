@@ -3,11 +3,6 @@
 clear all; 
 close all; 
 clc;
-% Festlegen aller Variabeln
-
-Q_a = 0;
-Q_b = 0;
-Q_c = 0;
 
 %% Zustandsgrößen 
 
@@ -49,7 +44,7 @@ Par_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des
 %% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
 % (Annahme : eingehender Massenstrom an Methan = 4*e-5 kg/s und wird vollständig verbrannt)
   
-% Reaktionsgleichung bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
+% Reaktionsgleihttps://github.com/Torxal/ProjektMaschinebauchung bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
     
 molM_CH4            = 0.01604; 
 molM_O2             = 0.032;   
@@ -191,50 +186,53 @@ B = double(subs(subs(subs( jacobian(dx_dt,vec_u), vec_x, x_AP), vec_e, e_AP), ve
 
 E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), vec_u, u_AP));
 
-% Zeitkonstanten
-1./abs(eig(A))
 
 % Eigenwertvorgabe
 
 p = (eig(A));
-p_w = 1.3*p;
+p_w = 1.3*[p(1) p(2) p(3)];
+
+%p_w = 1*p
+
 K = place(A,B,p_w); 
+
+% Zeitkonstanten
+
+1./abs(eig(A))
+1./abs(eig(A-B*K))
 
 % Störgrößen
 
-D_e = zeros(3,5);
-B_e = [B,E];
-%K_e = K*[1,0;0,1;0,0];
-K_e = place(A,B_e,p_w);
-
-
-
 % Regelung
 
-C_lin = [1,0,0;0,1,0];
+C = [1,0,0;0,1,0];
 D_lin = zeros(2,2);
 
-C =[1,0,0;0,1,0;0,0,1];
 D = zeros(3,2);
 
  
-S = (C_lin*((B*K-A)^(-1))*B)^(-1);
+S = inv(C*(inv(-A+B*K))*B);
+
 % Initialisierungsparameter für die lineare ZRD
 Par_Ini_lin = Par_Ini - x_AP;
 
-% Zeitkonstant des geregleten Systems
-1./abs(eig(A-B_e*K_e))
-
 % Arbeitspunkte der Regelgröße
-x_AP_lin = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ];
+y_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ];
 
 K_2 = [1,0;0,0]*K;
 
 p_2 = eig(A-B*K_2); % -> Eigenwerte sind negativ -> asymptotisch stabil
 
-%x_soll = x_AP_lin;
-x_soll = [ 2400 ; 2000];
+%x_soll = y_AP;
+x_soll = [ 1200; 1000];
 
+vec_z = [Q_a ; Q_b ; Q_c] + e_AP;
+
+% Festlegen Störgrößen
+
+Q_a = 0;
+Q_b = 0;
+Q_c = 0;
 
 % vec_u_stoer = [vec_u;vec_e];
 % u_AP_stoer  = [u_AP;e_AP];

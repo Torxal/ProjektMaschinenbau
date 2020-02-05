@@ -30,12 +30,13 @@ A_bw_i          = vec_par(17);
 k_gas_w         = vec_par(18);
 k_w_luft        = vec_par(19);
 ms_H2O          = vec_par(20);
+molM_bg         = vec_par(21) ;
 T_bg_in         = vec_e(1);
 T_wt_in         = vec_e(2);
 T_u             = vec_e(3);
 ms_bg           = vec_e(4);
 
-dx_dt(1) = (1/(m_b*c_b))     * (ms_bg*c_bg*( T_bg_in - T_b )       -  A_wt*k_gas_wt*(T_b - T_wt_out)   - A_bw_i * k_gas_w*(T_b - T_bw) + H0*ns_bg*y_0-Q_a);
+dx_dt(1) = (1/(m_b*c_b))     * (ms_bg*c_bg*( T_bg_in - T_b )       -  A_wt*k_gas_wt*(T_b - T_wt_out)   - A_bw_i * k_gas_w*(T_b - T_bw) + H0*(ms_bg/molM_bg)*y_0-Q_a);
 dx_dt(2) = (1/(c_wt_function(T_wt_out) * m_wt)) * (ms_wt_f * c_wt_function(T_wt_out) * (T_wt_in - T_wt_out) +  A_wt*k_gas_wt*( T_b - T_wt_out )- verdampfungswaerme(T_wt_out)*ms_wt_f-Q_b);
 dx_dt(3) = (1/(m_bw*c_bw))   * (A_bw_i*k_gas_w*(T_b - T_bw)        -  A_bw_a*k_w_luft*(T_bw - T_u));
 
