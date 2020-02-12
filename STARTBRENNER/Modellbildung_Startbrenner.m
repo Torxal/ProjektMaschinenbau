@@ -3,6 +3,13 @@
 clear all; 
 close all; 
 clc;
+  
+% Festlegen Störgrößen
+
+Q_a = 0;
+Q_b = 0;
+Q_c = 0;
+
 
 %% Zustandsgrößen 
 
@@ -34,21 +41,23 @@ T_bg_in             = 293.15;
 T_wt_in             = 293.15;
 T_u                 = 293.15;
 ms_CH4              = 4*(10.^(-4));
-ms_wt_air           = 6*(10.^(-3));
+ms_wt_air           = 5*(10.^(-3));
 
 %% Parameterfestlegung des Integrators
 
-Par_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des Integrators
+P_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des Integrators
 
 
 %% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
 % (Annahme : eingehender Massenstrom an Methan = 4*e-5 kg/s und wird vollständig verbrannt)
   
-% Reaktionsgleihttps://github.com/Torxal/ProjektMaschinebauchung bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
+% Reaktionsgleihttps: bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
     
 molM_CH4            = 0.01604; 
 molM_O2             = 0.032;   
 molM_N2             = 0.028;
+
+
 
 ns_CH4           	=  ms_CH4 / molM_CH4;
 ns_O2               =  2*ns_CH4;                
@@ -59,6 +68,8 @@ ms_N2               =  ns_N2*molM_N2;
 
 ms_bg               =  ms_CH4 + ms_O2 + ms_N2;
 ns_bg               =  ns_CH4 + ns_O2 + ns_N2;
+
+molM_bg             = ms_bg/ns_bg;
 
 mAnteil_CH4         = (ms_CH4/ms_bg);
 mAnteil_O2          = (ms_O2/ms_bg);
@@ -131,7 +142,7 @@ H_O2        =  0;
 H_CO2       = -392000;
 H_H2O       = -242800;
  
-H0  = abs((H_CO2 + 2*H_H2O) - (H_CH4 + 2*H_O2));                    
+H_bg  = abs((H_CO2 + 2*H_H2O) - (H_CH4 + 2*H_O2));                    
 
 %% Festlegung der Wärmeübergangskoeffizienten
 
@@ -146,8 +157,8 @@ vec_par     = zeros(19,1);
 vec_par(1)  = m_b;
 vec_par(2)  = c_b;
 vec_par(3)  = c_bg;
-vec_par(4)  = ns_bg;
-vec_par(5)  = H0;
+vec_par(4)  = molM_bg;
+vec_par(5)  = H_bg;
 vec_par(6)  = y_CH4;
 vec_par(7)  = c_air;
 vec_par(8)  = c_wt;
@@ -190,11 +201,11 @@ E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), ve
 % Eigenwertvorgabe
 
 p = (eig(A));
-p_w = 1.3*[p(1) p(2) p(3)];
+%p_w = [1.1*p(1) p(2) 1.3*p(3)];
 
-%p_w = 1*p
-
-K = place(A,B,p_w); 
+p_w = 1.3*p
+K = place(A,B,p_w);
+ 
 
 % Zeitkonstanten
 
@@ -206,15 +217,11 @@ K = place(A,B,p_w);
 % Regelung
 
 C = [1,0,0;0,1,0];
-D_lin = zeros(2,2);
-
-D = zeros(3,2);
-
  
 S = inv(C*(inv(-A+B*K))*B);
 
 % Initialisierungsparameter für die lineare ZRD
-Par_Ini_lin = Par_Ini - x_AP;
+P_Ini_lin = P_Ini - x_AP;
 
 % Arbeitspunkte der Regelgröße
 y_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ];
@@ -224,7 +231,7 @@ K_2 = [1,0;0,0]*K;
 p_2 = eig(A-B*K_2); % -> Eigenwerte sind negativ -> asymptotisch stabil
 
 %x_soll = y_AP;
-x_soll = [ 1200; 1000];
+x_soll = [ 1300; 1100];
 
 vec_z = [Q_a ; Q_b ; Q_c] + e_AP;
 
@@ -233,6 +240,14 @@ vec_z = [Q_a ; Q_b ; Q_c] + e_AP;
 Q_a = 0;
 Q_b = 0;
 Q_c = 0;
+
+Offset1 = 200; % in Kelvin
+Offset2 = 20;
+Offset3 = 100; 
+
+%Größen des Anfangsignals
+
+T = 60;
 
 % vec_u_stoer = [vec_u;vec_e];
 % u_AP_stoer  = [u_AP;e_AP];
