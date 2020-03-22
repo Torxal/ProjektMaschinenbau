@@ -55,7 +55,7 @@ M_N2             = 0.028;
 
 n_sCH4           	=  m_sCH4 / M_CH4;
 n_sO2               =  2*n_sCH4;                
-n_sN2               =  (79/21)*n_sO2;
+n_sN2               =  (78/21)*n_sO2;
         
 m_sO2               =  n_sO2*M_O2;
 m_sN2               =  n_sN2*M_N2;
