@@ -3,13 +3,6 @@
 clear all; 
 close all; 
 clc;
-  
-% Festlegen Störgrößen
-
-Q_a = 0;
-Q_b = 0;
-Q_c = 0;
-
 
 %% Zustandsgrößen 
 
@@ -23,9 +16,9 @@ vec_x = [x1;x2;x3];             ...  Zustandsvektor
      
 
 syms            ms_bg_sym           ... ms_bg_in   = ms_bg_out
-            ms_wt_air_sym           ... ms_air_in = ms_air_out
+                ms_air_sym          ... ms_air_in = ms_air_out
 
-vec_u = [ms_bg_sym ; ms_wt_air_sym];    ... Eingangssignal     
+vec_u = [ms_bg_sym ; ms_air_sym];    ... Eingangssignal     
     
 %% Störgrößen
 
@@ -40,12 +33,13 @@ vec_e = [T_bg_in_sym ; T_wt_in_sym ; T_u_sym];
 T_bg_in             = 293.15;
 T_wt_in             = 293.15;
 T_u                 = 293.15;
-ms_CH4              = 4*(10.^(-4));
-ms_wt_air           = 5*(10.^(-3));
+
+m_sCH4              = 4*(10.^(-4));
+m_sair              = 5*(10.^(-3));
 
 %% Parameterfestlegung des Integrators
 
-P_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des Integrators
+T_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des Integrators
 
 
 %% Berechnung der Massenanteile von Methan, Sauerstoff und Stickstoff im Brenngasgemisch
@@ -53,27 +47,27 @@ P_Ini             = [ 293.15  ; 293.15 ; 293.15  ]; ... Anfangsbedingungen des I
   
 % Reaktionsgleihttps: bei vollst. Verbrennung : CH4 + 2 O2 -> CO2 + 2 H2O
     
-molM_CH4            = 0.01604; 
-molM_O2             = 0.032;   
-molM_N2             = 0.028;
+M_CH4            = 0.01604; 
+M_O2             = 0.032;   
+M_N2             = 0.028;
 
 
 
-ns_CH4           	=  ms_CH4 / molM_CH4;
-ns_O2               =  2*ns_CH4;                
-ns_N2               =  (79/21)*ns_O2;
+n_sCH4           	=  m_sCH4 / M_CH4;
+n_sO2               =  2*n_sCH4;                
+n_sN2               =  (79/21)*n_sO2;
         
-ms_O2               =  ns_O2*molM_O2;
-ms_N2               =  ns_N2*molM_N2;
+m_sO2               =  n_sO2*M_O2;
+m_sN2               =  n_sN2*M_N2;
 
-ms_bg               =  ms_CH4 + ms_O2 + ms_N2;
-ns_bg               =  ns_CH4 + ns_O2 + ns_N2;
+m_sbg               =  m_sCH4 + m_sO2 + m_sN2;
+n_sbg               =  n_sCH4 + n_sO2 + n_sN2;
 
-molM_bg             = ms_bg/ns_bg;
+M_bg                =  m_sbg/n_sbg;
 
-mAnteil_CH4         = (ms_CH4/ms_bg);
-mAnteil_O2          = (ms_O2/ms_bg);
-mAnteil_N2          = (ms_N2/ms_bg);
+alpha_CH4           = (m_sCH4/m_sbg);
+alpha_O2            = (m_sO2/m_sbg);
+alpha_N2            = (m_sN2/m_sbg);
 
 %% Berechnung der mittleren Dichte des Brenngasgemisches
 
@@ -85,7 +79,7 @@ rho_air             = 1.293;
 
 %mittlere Dichte des Brenngases (Methan + Luft)
 
-rho_bg              =  (mAnteil_CH4)*rho_CH4 + (mAnteil_O2)*rho_O2 + (mAnteil_N2)*rho_N2; 
+rho_bg              =  (alpha_CH4)*rho_CH4 + (alpha_O2)*rho_O2 + (alpha_N2)*rho_N2; 
  
 %% Berechnung der Volumina des Brenners bzw des Wärmetauschers (werden als Zylinder angenommen)        
 
@@ -111,8 +105,7 @@ A_wt                =   n*2*pi*r*(r+h);             ... Wärmetauscher
 %% Berechnung der Massen
 
 m_bw                =   (V_b_a-V_b_i)*rho_eisen;    ... Brennwand
-m_b                 =   V_b_i*rho_bg;        ... Brenner
-%m_b                 =   (V_b_i-V_wt)*rho_bg;        ... Brenner
+m_b                 =   V_b_i*rho_bg;               ... Brenner
 m_wt                =   V_wt*rho_air;               ... Wärmetauscher
 
 %% Parametrieren der spezifischen Wärmekapazitäten
@@ -125,13 +118,13 @@ c_air               =   1050;
 
 % Mittlung der spezifischen Wärmekapazitäten von Brenner bzw. Wärmetauscher
 
-c_bg                =   (mAnteil_CH4)*c_CH4 + (mAnteil_O2)*c_O2 + (mAnteil_N2)*c_N2;
+c_bg                =   (alpha_CH4)*c_CH4 + (alpha_O2)*c_O2 + (alpha_N2)*c_N2;
 c_b                 =   c_bg;
 c_wt                =   c_air;
 
 % Methan-Anteil im Brenngas
 
-y_CH4               =   (ns_CH4/ns_bg);     % in Prozent
+y_CH4               =   (n_sCH4/n_sbg);     % in Prozent
 
 %% Verbrennungsenthalpie
 % Bildungsenthalpie = Betrag{[Summe der Enthalpien in Produkte - Summe der Enthalpien in Edukte]
@@ -146,38 +139,36 @@ H_bg  = abs((H_CO2 + 2*H_H2O) - (H_CH4 + 2*H_O2));
 
 %% Festlegung der Wärmeübergangskoeffizienten
 
-k_gas_wt             = 80;
-k_w_air              = 0.01;
-k_gas_w              = 200;
+k_wt                 = 80;
+k_u                  = 0.01;
+k_bw                 = 200;
 
 %% Festlegung des Parametervektors
 
-vec_par     = zeros(19,1);
+vec_par     = zeros(17,1);
 
 vec_par(1)  = m_b;
 vec_par(2)  = c_b;
 vec_par(3)  = c_bg;
-vec_par(4)  = molM_bg;
+vec_par(4)  = M_bg;
 vec_par(5)  = H_bg;
 vec_par(6)  = y_CH4;
 vec_par(7)  = c_air;
 vec_par(8)  = c_wt;
 vec_par(9)  = m_wt;
-vec_par(10) = k_gas_wt;
+vec_par(10) = k_wt;
 vec_par(11) = A_wt;
-vec_par(12) = Q_a;
-vec_par(13) = Q_b;
-vec_par(14) = m_bw;
-vec_par(15) = c_bw;
-vec_par(16) = A_bw_a;
-vec_par(17) = A_bw_i;
-vec_par(18) = k_gas_w;
-vec_par(19) = k_w_air;
+vec_par(12) = m_bw;
+vec_par(13) = c_bw;
+vec_par(14) = A_bw_a;
+vec_par(15) = A_bw_i;
+vec_par(16) = k_bw;
+vec_par(17) = k_u;
 
 %Arbeitspunkte 
 
 e_AP = [T_bg_in ; T_wt_in ; T_u]; 
-u_AP = [ ms_bg ; ms_wt_air ];
+u_AP = [ m_sbg ; m_sair ];
 
 
 % stat. Arbeitspunkt ausrechnen: 
@@ -200,11 +191,9 @@ E = double(subs(subs(subs( jacobian(dx_dt,vec_e), vec_x, x_AP), vec_e, e_AP), ve
 
 % Eigenwertvorgabe
 
-p = (eig(A));
-%p_w = [1.1*p(1) p(2) 1.3*p(3)];
-
-p_w = 1.3*p
-K = place(A,B,p_w);
+lambda = (eig(A));
+lambda_w = 1.3*lambda;
+K = place(A,B,lambda_w);
  
 
 % Zeitkonstanten
@@ -218,38 +207,26 @@ K = place(A,B,p_w);
 
 C = [1,0,0;0,1,0];
  
-S = inv(C*(inv(-A+B*K))*B);
+S_v = inv(C*(inv(-A+B*K))*B);
 
 % Initialisierungsparameter für die lineare ZRD
-P_Ini_lin = P_Ini - x_AP;
+T_Ini_Lin = T_Ini - x_AP;
 
 % Arbeitspunkte der Regelgröße
 y_AP = [double(x_AP_berechnet.x1) ; double(x_AP_berechnet.x2) ];
 
-K_2 = [1,0;0,0]*K;
+w = [1200; 1000];
 
-p_2 = eig(A-B*K_2); % -> Eigenwerte sind negativ -> asymptotisch stabil
+% Festlegen Störtemperaturen
 
-%x_soll = y_AP;
-x_soll = [ 1300; 1100];
+T_off_bg  = 0;
+T_off_wt  = 0;
+T_off_u   = 0;
 
-vec_z = [Q_a ; Q_b ; Q_c] + e_AP;
+vec_T = [T_off_bg ; T_off_wt ; T_off_u];
 
-% Festlegen Störgrößen
+vec_z = vec_T + e_AP;
 
-Q_a = 0;
-Q_b = 0;
-Q_c = 0;
+%Größen des PT1-Signals
 
-Offset1 = 200; % in Kelvin
-Offset2 = 20;
-Offset3 = 100; 
-
-%Größen des Anfangsignals
-
-T = 60;
-
-% vec_u_stoer = [vec_u;vec_e];
-% u_AP_stoer  = [u_AP;e_AP];
-
-
+t = 60;
